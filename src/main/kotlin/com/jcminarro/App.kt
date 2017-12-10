@@ -16,12 +16,15 @@ class KiotaArgs(parse: ArgParser) {
 
     private val tags by parse.adding("-t", help = "Tag")
 
+    private val approvees by parse.adding("-A", help = "Approvee")
+
     val command by parse.mapping(
             "--nodeInfo" to GetNodeInfoCommand,
             "-i" to GetNodeInfoCommand,
             "--findByAddress" to FindByAddressCommand({addresses.toTypedArray()}),
             "--findByBundle" to FindByBundleCommand({bundles.toTypedArray()}),
             "--findByTag" to FindByTagCommand({tags.toTypedArray()}),
+            "--findByApprovee" to FindByApproveeCommand({approvees.toTypedArray()}),
             help = "Command")
 }
 
@@ -40,6 +43,7 @@ class KiotaCommander(private val command: KiotaCommand) {
         is FindByAddressCommand -> Gson().toJson(iotaApi.findTransactionObjectsByAddresses(command.addresses))
         is FindByBundleCommand -> Gson().toJson(iotaApi.findTransactionObjectsByBundle(command.bundles))
         is FindByTagCommand -> Gson().toJson(iotaApi.findTransactionObjectsByTag(command.tags))
+        is FindByApproveeCommand -> Gson().toJson(iotaApi.findTransactionObjectsByApprovees(command.approvees))
     }
 }
 
@@ -56,4 +60,8 @@ data class FindByBundleCommand(private val getBundlesFunction: () -> Array<Strin
 data class FindByTagCommand(private val getTagsFunction: () -> Array<String>) : KiotaCommand(){
     val tags
         get() = getTagsFunction()
+}
+data class FindByApproveeCommand(private val getApproveesFunction: () -> Array<String>) : KiotaCommand(){
+    val approvees
+        get() = getApproveesFunction()
 }
